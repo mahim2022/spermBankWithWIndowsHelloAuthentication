@@ -17,12 +17,10 @@ export async function POST(req: Request) {
   let decoded;
   try {
     decoded = await adminAuth.verifyIdToken(idToken, true);
-    console.log('Decoded ID token:', decoded);
   } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
   const uid = decoded.uid;
-  console.log(uid);
   // 2) Load this user's registered passkeys (stored during registration)
   const credsSnap = await adminDb
     .collection('webauthnCredentials')
@@ -47,7 +45,6 @@ export async function POST(req: Request) {
   
 });
 
-console.log('Authentication options:', options);
 
 
   // 4) Persist challenge for later verification

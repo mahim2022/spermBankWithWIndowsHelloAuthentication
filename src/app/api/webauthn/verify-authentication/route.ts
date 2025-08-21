@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
-import { base64UrlToBuffer } from '@/lib/webAuthCodec';
+import { base64UrlToBuffer, bufferToBase64Url } from '@/lib/webAuthCodec';
 
 function getBearer(req: Request) {
   const h = req.headers.get('authorization') || '';
@@ -20,21 +20,22 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
+
   const uid = decoded.uid;
-  console.log(uid);
+
+
   // 2) Read the browser's WebAuthn assertion
   const assertion = await req.json();
-  const assertionID: string | undefined = assertion?.id;
+  const assertionID: string | undefined = bufferToBase64Url(assertion?.id);
   if (!assertionID) {
-    return NextResponse.json({ error: 'Missing assertion id' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing assertion id' }, { status: 402 });
   }
-  console.log('Assertion ID:', assertionID);
-  // 3) Load expected challenge
+
   const chRef = adminDb.collection('webauthnChallenges').doc(uid);
   const chSnap = await chRef.get();
   const expectedChallenge: string | undefined = chSnap.data()?.authenticationChallenge;
   if (!expectedChallenge) {
-    return NextResponse.json({ error: 'No challenge for user' }, { status: 400 });
+    return NextResponse.json({ error: 'No challenge for user' }, { status: 403 });
   }
 
   // 4) Find the matching credential for this assertion
@@ -44,12 +45,15 @@ export async function POST(req: Request) {
     .collection('creds')
     .doc(assertionID); // we saved doc id === credentialID (base64url)
   const credSnap = await credRef.get();
-  console.log('Credential Snap:', credSnap.id);
+
+
+
   if (!credSnap.exists) {
-    return NextResponse.json({ error: 'Credential not found for user' }, { status: 400 });
+    return NextResponse.json({ error: 'Credential not found for user' }, { status: 404 });
   }
 
   const cred = credSnap.data()!;
+
   const authenticator = {
     // verifyAuthenticationResponse expects Buffers here
     credentialID: base64UrlToBuffer(cred.credentialID),
@@ -64,12 +68,17 @@ export async function POST(req: Request) {
     expectedChallenge,
     expectedOrigin: process.env.NEXT_PUBLIC_WEBAUTHN_ORIGIN!, // e.g. 'http://localhost:3000'
     expectedRPID: process.env.NEXT_PUBLIC_WEBAUTHN_RP_ID!,     // e.g. 'localhost'
-    authenticator,
+    credential: {
+      id: cred.credentialID,
+      publicKey: authenticator.credentialPublicKey,
+      counter: cred.counter,
+      transports: cred.transports,
+    },
     requireUserVerification: true,
   });
 
   if (!verification.verified || !verification.authenticationInfo) {
-    return NextResponse.json({ verified: false }, { status: 400 });
+    return NextResponse.json({ verified: false }, { status: 405 });
   }
 
   // 6) Update the credential counter and clear the challenge

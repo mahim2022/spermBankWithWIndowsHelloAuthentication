@@ -12,7 +12,6 @@ export async function POST(req: Request) {
     
   const idToken = getBearer(req);
 
-  // console.log('ID Token:', idToken);
 
   if (!idToken) return NextResponse.json({ error: 'Missing token' }, { status: 401 });
 
