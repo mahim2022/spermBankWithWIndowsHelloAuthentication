@@ -33,27 +33,27 @@ This project demonstrates secure step-up authentication using Windows Hello with
         }
 
 
-When to log:
+        When to log:
 
-After a successful email/password login
+            After a successful email/password login
 
-After a successful WebAuthn biometric login
+            After a successful WebAuthn biometric login
 
-After any donor data changes
+            After any donor data changes
 
-After sperm retrieval confirmation
+            After sperm retrieval confirmation
 
-On suspicious/failed login attempts
+            On suspicious/failed login attempts
 
-Implementation approach:
+            Implementation approach:
 
-Create a helper function in your Next.js app, e.g. logAuditAction(uid, action, details?)
+            Create a helper function in your Next.js app, e.g. logAuditAction(uid, action, details?)
 
-This function calls a Next.js API route (so logs are written server-side, ensuring tamper-proofing).
+            This function calls a Next.js API route (so logs are written server-side, ensuring tamper-proofing).
 
-The API route writes into Firestore.
+            The API route writes into Firestore.
 
-Audit Trail Logging
+            Audit Trail Logging
 
 3. Prerequisites
 

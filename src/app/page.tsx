@@ -25,7 +25,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { signInWithPasskey } from '@firebase-web-authn/browser';
 import PasskeySignInButton from '../components/PasskeySignInButton'; // adjust import
-
+import { logAudit } from '../lib/audit'; // adjust import
 
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -103,6 +103,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     const password= data.get('password') as string;
     try {
         await signIn(email.trim(), password);
+        await logAudit('login', { method: 'password' });
         router.push('/dashboard');
     } catch (err: any) {
       console.error(err);

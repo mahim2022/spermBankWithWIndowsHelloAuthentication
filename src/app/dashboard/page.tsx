@@ -1,57 +1,31 @@
-// src/app/dashboard/page.tsx
 'use client';
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 
-import { useRouter } from 'next/navigation';
-import { linkWithPasskey } from '@firebase-web-authn/browser';
-import { auth, functions } from '@/lib/firebase';
-import { Box, Button, Container, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
-import PasskeyStepUpButton from '@/components/PasskeyStepUpButton';
-import PasskeyLinkButton from '@/components/PasskeyLinkButton';
+import * as React from 'react';
+import { Grid, Card, CardActionArea, CardContent, Typography } from '@mui/material';
+import Link from 'next/link';
 
-export default  function DashboardPage() {
-  const { user, loading, signOut } = useAuth();
-  const router = useRouter();
-   const [linkLoading, setlinkLoading] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+const tiles = [
+  { title: 'Register Donor', desc: 'Add new donor record', href: '/dashboard/donors' },
+  { title: 'Start Retrieval', desc: 'Confirm a sperm retrieval', href: '/dashboard/retrieval' },
+  { title: 'View Audit Logs', desc: 'Review sensitive activities', href: '/dashboard/logs' },
+  { title: 'Settings', desc: 'Profile, security, passkeys', href: '/dashboard/settings' },
+];
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/');
-    }
-  }, [user, loading, router]);
-
-
-  if (loading || !user || linkLoading) return <div style={{ padding: 24 }}>Loading…</div>;
-
-    const currentUser = auth.currentUser;
-          if (!currentUser) throw new Error('Not signed in');
-          // console.log('Current User:', currentUser);
-          const idToken =  currentUser.getIdToken(true).then((token) => {
-            console.log('ID Token:', token)})
-          // console.log('ID Token:', idToken);
- 
+export default function DashboardHome() {
   return (
-    <Container sx={{ py: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Dashboard
-      </Typography>
-      <Typography>Signed in as: {user.email}</Typography>
-      {/* <Typography>User Token {user}</Typography> */}
-
-
-      <Box sx={{ mt: 3 }}>
-        <Button variant="contained" color="secondary" onClick={() => signOut()}>
-          Sign out
-        </Button>
-      </Box>
-     <PasskeyLinkButton />
-     <PasskeyStepUpButton onSuccess={() => {
-        setMsg('Passkey verified successfully!');}}/>
-     {/* <PasskeyStepUpButton onSuccess={() => {
-        setMsg('Passkey verified successfully!');> */}
-    </Container>
+    <Grid container spacing={2}>
+      {tiles.map((t) => (
+        <Grid item xs={12} md={6} lg={4} key={t.href}>
+          <Card elevation={0} sx={{ borderRadius: 2 }}>
+            <CardActionArea component={Link} href={t.href} sx={{ p: 2 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>{t.title}</Typography>
+                <Typography variant="body2" color="text.secondary">{t.desc}</Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
   );
 }
