@@ -17,6 +17,7 @@
     "@mui/material": "^7.3.1",
     "@mui/material-nextjs": "^7.3.0",
     "@mui/styled-engine-sc": "^7.3.1",
+    "@mui/x-data-grid": "^8.10.2",
     "@simplewebauthn/browser": "^13.1.2",
     "@simplewebauthn/server": "^13.1.2",
     "firebase": "^12.1.0",

@@ -42,6 +42,7 @@ export default function PasskeyStepUpButton({ onSuccess }: { onSuccess: () => vo
       if (!verifyRes.ok || !result.verified) throw new Error(result?.error || 'Verification failed');
 
       onSuccess();
+      
     } catch (e: any) {
       setErr(e?.message || String(e));
     } finally {
