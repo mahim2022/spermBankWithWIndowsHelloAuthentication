@@ -3,6 +3,11 @@
 import * as React from 'react';
 import { Grid, Card, CardActionArea, CardContent, Typography } from '@mui/material';
 import Link from 'next/link';
+import { passkeyStepUpVerify } from '@/lib/usePassKeyStepUp';
+// import { Router } from 'next/router';
+import { useRouter  } from 'next/navigation';
+
+
 
 const tiles = [
   { title: 'Register Donor', desc: 'Add new donor record', href: '/dashboard/donors' },
@@ -17,7 +22,7 @@ export default function DashboardHome() {
       {tiles.map((t) => (
         <Grid item xs={12} md={6} lg={4} key={t.href}>
           <Card elevation={0} sx={{ borderRadius: 2 }}>
-            <CardActionArea component={Link} href={t.href} sx={{ p: 2 }}>
+            <CardActionArea  component={Link} href={t.href} sx={{ p: 2 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>{t.title}</Typography>
                 <Typography variant="body2" color="text.secondary">{t.desc}</Typography>
