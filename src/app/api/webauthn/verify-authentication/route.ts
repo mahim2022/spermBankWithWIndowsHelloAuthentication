@@ -23,7 +23,6 @@ export async function POST(req: Request) {
 
   const uid = decoded.uid;
 
-
   // 2) Read the browser's WebAuthn assertion
   const assertion = await req.json();
   const assertionID: string | undefined = bufferToBase64Url(assertion?.id);
@@ -45,7 +44,6 @@ export async function POST(req: Request) {
     .collection('creds')
     .doc(assertionID); // we saved doc id === credentialID (base64url)
   const credSnap = await credRef.get();
-
 
 
   if (!credSnap.exists) {

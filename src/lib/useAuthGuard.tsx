@@ -39,7 +39,7 @@ export function useAuthGuard() {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       if (!u) {
-        router.replace('/login'); // not logged in → login
+        router.replace('/'); // not logged in → login
       } 
     });
     return () => unsub();
